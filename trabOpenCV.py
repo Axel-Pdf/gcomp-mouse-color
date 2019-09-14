@@ -10,7 +10,7 @@ SCREEN_X, SCREEN_Y = pyautogui.size()
 CLICK = CLICK_MESSAGE = MOVEMENT_START = None
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while cap.isOpened():
     ret, img = cap.read()
