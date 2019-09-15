@@ -21,11 +21,11 @@ from collections import deque
 corUpper = (24, 100, 100)
 corLower = (44, 255, 255)
 
-cliqueUpper = ()
-cliqueLower = ()
+cliqueUpper = (61, 56, 108)
+cliqueLower = (81, 255, 255)
 
-fechaUpper = ()
-fechaLower = ()
+fechaUpper = (20, 118, 145)
+fechaLower = (40, 255, 255)
 
 #numero máximo de pontos. Pesquisar melhor implementacao
 comp = 50
@@ -73,18 +73,16 @@ while True:
     
     #Mesmo processo para elementos de clique e fechamento
     mascaraClique = cv.inRange(hsv, cliqueUpper, cliqueLower)
-    mascaraClique = cv.erode(mascaraClique, None, iterations=2)
-    mascaraClique = cv.dilate(mascaraClique, None, iterations=2)
-    
+#    mascaraClique = cv.erode(mascaraClique, None, iterations=2)
+#    mascaraClique = cv.dilate(mascaraClique, None, iterations=2)
+#    
     mascaraFecha = cv.inRange(hsv, fechaUpper, fechaLower)
-    mascaraFecha = cv.erode(mascaraFecha, None, iterations=2)
-    mascaraFecha = cv.dilate(mascaraFecha, None, iterations=2)
+#    mascaraFecha = cv.erode(mascaraFecha, None, iterations=2)
+#    mascaraFecha = cv.dilate(mascaraFecha, None, iterations=2)
     
+    contornosC = cv.findContours(mascaraClique.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     
-    
-    (_, contornosC, hier) = cv.findContours(mascaraClique.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    
-    (_, contornosF, hier) = cv.findContours(mascaraFecha.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contornosF = cv.findContours(mascaraFecha.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     
     #encontra contornos na mascara e inicializa
     #(x, y) 
