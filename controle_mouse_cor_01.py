@@ -20,15 +20,17 @@ from collections import deque
 #Lower bount das cores detectadas
 #corUpper = (24, 100, 100)
 #corLower = (44, 255, 255)
+#
+##clique - magenta
+#cliqueUpper = (152, 102, 217)
+#cliqueLower = (172, 112, 237)
+#
+##fecha - anil
+#fechaUpper = (87, 91, 183)
+#fechaLower = (107, 111, 203)
 
-corUpper = (24, 100, 100)
-corLower = (44, 120, 120)
-#postLaranja
-cliqueLower = (61, 56, 108)
-cliqueUpper = (81, 255, 255)
-#postAzul
-fechaLower = (20, 118, 145)
-fechaUpper = (40, 255, 255)
+lower = {'amarelo':(24, 100, 100), 'magenta':(152, 102, 217), 'anil':(87, 91, 183)}
+upper = {'amarelo':(44, 255, 255), 'magenta':(172, 255, 255), 'anil':(107, 255, 255)}
 
 #numero máximo de pontos. Pesquisar melhor implementacao
 comp = 50
@@ -39,6 +41,7 @@ pontosC = deque(maxlen = compC)
 #pontosF
 compF = 50
 pontosF = deque(maxlen = compF)
+
 
 #Inicia a camera
 cam = cv.VideoCapture(1)
@@ -76,36 +79,26 @@ while True:
     #constroi a marcara com a cor designada e um lower bound
     #remove marcas ou bolhas na deteccao ocm dilataçoes e erosoes de imagem
     mascara = cv.inRange(hsv, corUpper, corLower)
-#    mascara = cv.erode(mascara, None, iterations=2)
-#    mascara = cv.dilate(mascara, None, iterations=2)
-#    corMascara = cv.bitwise_and(frame, frame, mask=mascara)
-#    
+    mascara = cv.erode(mascara, None, iterations=2)
+    mascara = cv.dilate(mascara, None, iterations=2)
+    
     #Mesmo processo para elementos de clique e fechamento
     mascaraClique = cv.inRange(hsv, cliqueUpper, cliqueLower)
-#    mascaraClique = cv.erode(mascaraClique, None, iterations=2)
-#    mascaraClique = cv.dilate(mascaraClique, None, iterations=2)
-#    corClique = cv.bitwise_and(frame, frame, mask=mascaraClique)
+    mascaraClique = cv.erode(mascaraClique, None, iterations=2)
+    mascaraClique = cv.dilate(mascaraClique, None, iterations=2)
 #    
-##    
     mascaraFecha = cv.inRange(hsv, fechaUpper, fechaLower)
-#    mascaraFecha = cv.erode(mascaraFecha, None, iterations=2)
-#    mascaraFecha = cv.dilate(mascaraFecha, None, iterations=2)
-#    corFecha = cv.bitwise_and(frame, frame, mask=mascaraFecha)
-#    
-    contornosC = cv.findContours(mascaraClique.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[-2]
+    mascaraFecha = cv.erode(mascaraFecha, None, iterations=2)
+    mascaraFecha = cv.dilate(mascaraFecha, None, iterations=2)
     
-    contornosF = cv.findContours(mascaraFecha.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[-2]
+    contornosC = cv.findContours(mascaraClique.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    
+    contornosF = cv.findContours(mascaraFecha.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     
     #encontra contornos na mascara e inicializa
     #(x, y) 
     contornos = cv.findContours(mascara.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[-2]
-    
-    
     centro = None
-    
-    centroC = None
-    
-    centroF = None
     
     #continua apenas se foi encontrado um contorno
     if len(contornos) > 0:
@@ -123,7 +116,8 @@ while True:
             cv.circle(frame, (int(x), int(y)), int(raio), (0, 255, 255), 2)
             
             cv.circle(frame, centro, 5, (0, 0, 255), -1)
-                        
+            
+            
     #atualiza fila de pontos
     pontos.appendleft(centro)
     
@@ -138,83 +132,22 @@ while True:
         grossLinha = int(np.sqrt(comp / float(i + 1)) * 2.5)
         cv.line(frame, pontos[i - 1], pontos[i], (0, 0, 255), grossLinha)
         
-
-#    #continua se o contorno do clique for encontrado
-#    if len(contornosC) > 0:
-#        
-#        cC = max(contornosC, key=cv.contourArea)
-#        ((w, z), raioC) = cv.minEnclosingCircle(cC)
-#        Mc = cv.moments(cC)
-#        centroC = (int(Mc["m10"] / Mc["m00"]), int(Mc["m01"] / Mc["m00"]))
-#        
-#        if raioC > 10:
-#            #Desenha circulo e centroide no frame
-#            #Atualiza a lista de pontos rastreados
-#            cv.circle(frame, (int(w), int(z)), int(raioC), (0, 255, 255), 2)
-#            
-#            cv.circle(frame, centroC, 5, (0, 0, 255), -1)
-#
-#    pontosC.appendleft(centroC)       
-#        #percorre setn de pontos e, havendo, s=desenha linha
-#    
-#    for j in range(1, len(pontosC)):
-#        
-#        if pontos[j -1] is None or pontosC[j] is None:
-#            continue
-#        
-#        
-#        grossLinhaC = int(np.sqrt(compC / float(j + 1)) * 2.5)
-#        cv.line(frame, pontosC[j - 1], pontosC[j], (0, 0, 255), grossLinhaC)
-#        
-#        
-#            
-#    #continua se o contorno do clique for encontrado
-#    if len(contornosF) > 0:
-#        
-#        cF = max(contornosF, key=cv.contourArea)
-#        ((a, b), raioF) = cv.minEnclosingCircle(cF)
-#        Mf = cv.moments(cF)
-#        centroF = (int(Mf["m10"] / Mf["m00"]), int(Mf["m01"] / Mf["m00"]))
-#        
-#        if raioF > 10:
-#            #Desenha circulo e centroide no frame
-#            #Atualiza a lista de pontos rastreados
-#            cv.circle(frame, (int(a), int(b)), int(raioF), (0, 255, 255), 2)
-#            
-#            cv.circle(frame, centroF, 5, (0, 0, 255), -1)
-#
-#
-#    pontosF.appendleft(centroF)
-#    
-#    for l in range(1, len(pontosF)):
-#        
-#        if pontosF[l -1] is None or pontosF[l] is None:
-#            continue
-#        
-#        grossLinhaF = int(np.sqrt(compF / float(l + 1)) * 2.5)
-#        cv.line(frame, pontosF[l - 1], pontosF[l], (0, 0, 255), grossLinhaF)
-#
-#
-
-
-
     #Move mouse usando centro
     if centro is not None:
         pag.moveTo(x = (centro[0] - 5), y=(centro[1] - 5))
     
     
     #clique se cor aparece para a camera
-    #if len(contornosC) > 0:
-#    if centroC is not None:
-#        pag.click()
+    if len(contornosC) > 0:
+        #pag.click()
+        print("COR 1")
 #        
 #    #encerra programa se cor aparece para a camera
-#    #if len(contornosF) > 0:
-#    if centroF is not None:
+#    if len(contornosF) > 0:
 #        break
     
     #Mostra imagem na linha
-    cv.imshow("Camera", frame)
+    #cv.imshow("Camera", frame)
     
     key = cv.waitKey(1) & 0xFF
     
