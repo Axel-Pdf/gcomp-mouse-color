@@ -30,8 +30,8 @@ from collections import deque
 #fechaLower = (107, 111, 203)
 
 #boundaries
-lower = {'amarelo':(24, 100, 100), 'magenta':(152, 102, 217), 'anil':(87, 91, 183)}
-upper = {'amarelo':(44, 255, 255), 'magenta':(172, 255, 255), 'anil':(107, 255, 255)}
+lower = {'amarelo':(24, 100, 100), 'magenta':(152, 102, 217), 'anil':(87, 91, 183), 'laranja': (20, 130, 210)}
+upper = {'amarelo':(44, 255, 255), 'magenta':(172, 255, 255), 'anil':(107, 255, 255), 'laranja': (40, 255, 255)}
 
 #Cor padrao dos circulos
 colors = {'amarelo': (0, 0, 255), 'magenta':(0, 255, 0), 'anil':(255, 0, 0)}
@@ -86,6 +86,12 @@ while True:
             cv.CHAIN_APPROX_SIMPLE)[-2]
         center = None
         
+        if key == 'magenta':
+            pag.click()
+        
+        elif key == 'anil':
+            break
+        
         # only proceed if at least one contour was found
         if len(cnts) > 0:
             # find the largest contour in the mask, then use
@@ -101,19 +107,14 @@ while True:
                 # draw the circle and centroid on the frame,
                 # then update the list of tracked points
                 cv.circle(frame, (int(x), int(y)), int(radius), colors[key], 2)
-                pag.moveTo(x = (center[0] - 5), y=(center[1] - 5))
-                
-                if key == 'magenta':
-                    pag.click()
-                elif key == 'anil':
-                    break
-                    
+                pag.moveTo(x = (center[0] - 10), y=(center[1] - 10))
+                 
                 #cv.putText(frame,key + " ball", (int(x-radius),int(y-radius)), cv2.FONT_HERSHEY_SIMPLEX, 0.6,colors[key],2)  
 
 
     
     #Mostra imagem na linha
-    cv.imshow("Camera", frame)
+    #cv.imshow("Camera", frame)
     
     key = cv.waitKey(1) & 0xFF
     
